@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donación 1000 ARS = Evento Aleatorio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg-base: #120E1A;
+    --bg-panel: #1C1730;
+    --bg-panel-2: #241D3B;
+    --chaos: #FF2E6E;
+    --chaos-dim: #C21E56;
+    --glitch: #22E8C9;
+    --mp-blue: #00B1EA;
+    --text: #F1EDF7;
+    --text-dim: #B9AFCB;
+    --border: rgba(241,237,247,0.10);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg-base);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,46,110,0.14), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(34,232,201,0.08), transparent);
+    color: var(--text);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+
+  :focus-visible{
+    outline: 2px solid var(--glitch);
+    outline-offset: 3px;
+  }
+
+  canvas#fx{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .wrap{
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ---- cinta de advertencia ---- */
+  .hazard-strip{
+    width: 100%;
+    overflow: hidden;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--chaos-dim), var(--chaos-dim) 18px,
+      #1a1024 18px, #1a1024 36px
+    );
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+  }
+  .hazard-strip p{
+    margin:0;
+    white-space: nowrap;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 22s linear infinite;
+  }
+  @keyframes marquee{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(-100%); }
+  }
+
+  /* ---- hero ---- */
+  header.hero{
+    padding: 64px 0 40px;
+    text-align: left;
+  }
+  .kicker{
+    font-size: 14px;
+    color: var(--glitch);
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+  h1{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(2.1rem, 7vw, 3.4rem);
+    line-height: 1.05;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  h1 span.glitch{
+    position: relative;
+    color: var(--chaos);
+    display: inline-block;
+  }
+  h1 span.glitch:hover{
+    animation: glitch 0.35s steps(2, end) 2;
+  }
+  @keyframes glitch{
+    0%{ transform: translate(0,0); text-shadow: none; }
+    20%{ transform: translate(-2px, 1px); text-shadow: 2px 0 var(--glitch); }
+    40%{ transform: translate(2px, -1px); text-shadow: -2px 0 var(--chaos); }
+    60%{ transform: translate(-1px, 0); text-shadow: 2px 0 var(--glitch); }
+    100%{ transform: translate(0,0); text-shadow: none; }
+  }
+  .lede{
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 52ch;
+    margin: 0 0 28px;
+  }
+  .hero-cta{
+    display:flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn{
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn-ghost{
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover{ border-color: var(--glitch); color: var(--glitch); }
+
+  /* ---- pasos ---- */
+  section.steps{
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+  }
+  section.steps h2{
+    font-size: 13px;
+    text-transform: none;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin: 0 0 24px;
+  }
+  .step{
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+  }
+  .step:first-of-type{ border-top: none; }
+  .step .n{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 20px;
+    color: var(--chaos);
+  }
+  .step h3{
+    margin: 0 0 4px;
+    font-size: 16px;
+  }
+  .step p{
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 14.5px;
+  }
+
+  /* ---- panel de donacion ---- */
+  section.donate{
+    margin-top: 44px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  section.donate::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--chaos), var(--glitch));
+  }
+  .donate-top{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .donate-top h2{
+    margin:0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .amount{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 28px;
+    color: var(--text);
+  }
+  .amount small{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .donate p.desc{
+    color: var(--text-dim);
+    font-size: 14.5px;
+    margin: 10px 0 24px;
+  }
+  .btn-mp{
+    width: 100%;
+    background: var(--mp-blue);
+    color: #06222c;
+    font-size: 16px;
+    padding: 16px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 10px;
+  }
+  .btn-mp:hover{ filter: brightness(1.08); }
+  .btn-mp:disabled{
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .donate-status{
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-dim);
+    min-height: 18px;
+  }
+  .donate-status.err{ color: var(--chaos); }
+  .donate-status.ok{ color: var(--glitch); }
+
+  /* ---- ticker de ultimos eventos (demo) ---- */
+  section.feed{
+    margin-top: 40px;
+  }
+  section.feed h2{
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+  ul.feed-list{
+    list-style: none;
+    margin:0; padding:0;
+    display:flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  ul.feed-list li{
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    display:flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  ul.feed-list li b{ color: var(--text); }
+
+  footer{
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  footer a{ color: var(--glitch); text-decoration: none; }
+  footer a:hover{ text-decoration: underline; }
+
+  @media (prefers-reduced-motion: reduce){
+    .hazard-strip p{ animation: none; }
+    h1 span.glitch:hover{ animation: none; }
+    html{ scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fx"></canvas>
+
+<div class="hazard-strip">
+  <p>ADVERTENCIA — DONAR ACTIVA UN EVENTO ALEATORIO DEL CHAOS MOD EN VIVO — SIN VUELTA ATRÁS — ADVERTENCIA — DONAR ACTIVA UN EVENTO ALEATORIO DEL CHAOS MOD EN VIVO — SIN VUELTA ATRÁS —</p>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">EN VIVO AHORA · MULTISTREAM KICK / TIKTOK</p>
+    <h1>Doná $1000 y <span class="glitch">arruiname</span> la partida</h1>
+    <p class="lede">
+      Estoy jugando GTA V con el Chaos Mod activado. Cada donación de $1000 ARS o más
+      dispara un evento aleatorio al toque, en vivo, sin que yo sepa cuál viene.
+      Vos elegís cuándo joderme.
+    </p>
+    <div class="hero-cta">
+      <a href="#donar" class="btn" style="background:var(--chaos); color:#fff;">Ir a donar</a>
+      <a href="#como-funciona" class="btn btn-ghost">Cómo funciona</a>
+    </div>
+  </header>
+
+  <section class="steps" id="como-funciona">
+    <h2>Cómo funciona</h2>
+    <div class="step">
+      <span class="n">1</span>
+      <div>
+        <h3>Donás $1000 ARS por Mercado Pago</h3>
+        <p>Un solo botón, sin cuenta ni registro. Pagás como cualquier compra online.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="n">2</span>
+      <div>
+        <h3>Confirmamos el pago real</h3>
+        <p>Verificamos el monto directamente con Mercado Pago antes de hacer nada, para que nadie pueda colarse gratis.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="n">3</span>
+      <div>
+        <h3>El Chaos Mod te obedece</h3>
+        <p>Se dispara un evento aleatorio en mi partida y tu nombre aparece en pantalla al toque.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="donate" id="donar">
+    <div class="donate-top">
+      <h2>Activar el caos</h2>
+      <div class="amount">$1000<small> ARS mínimo</small></div>
+    </div>
+    <p class="desc">
+      Al presionar el botón se abre Mercado Pago en una pestaña nueva. El evento se dispara
+      apenas se confirma el pago, no antes.
+    </p>
+    <button class="btn btn-mp" id="btnDonar">Donar con Mercado Pago</button>
+    <p class="donate-status" id="donateStatus"></p>
+  </section>
+
+  <section class="feed">
+    <h2>Últimos en romperme la partida</h2>
+    <ul class="feed-list" id="feedList">
+      <li><span><b>lucho_23</b> disparó un evento</span><span>hace 4 min</span></li>
+      <li><span><b>naty.ok</b> disparó un evento</span><span>hace 11 min</span></li>
+      <li><span><b>elmarto</b> disparó un evento</span><span>hace 26 min</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>
+      Esta página no está afiliada a Rockstar Games, Take-Two Interactive ni Mercado Pago.
+      "GTA V" y "Chaos Mod" se mencionan solo para describir el uso previsto de la donación.
+    </p>
+    <p>
+      Seguime en <a href="#" id="linkKick">Kick</a> y <a href="#" id="linkTiktok">TikTok</a>.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     1) FONDO: unas pocas líneas "glitch" sutiles en canvas.
+     Puramente decorativo, no consume del backend.
+  ========================================================= */
+  var canvas = document.getElementById('fx');
+  var ctx = canvas.getContext('2d');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lines = [];
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function spawnLine(){
+    lines.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      w: 40 + Math.random() * 160,
+      life: 0,
+      maxLife: 30 + Math.random() * 30,
+      color: Math.random() > 0.5 ? '34,232,201' : '255,46,110'
+    });
+  }
+
+  function tick(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (Math.random() < 0.04 && lines.length < 14) spawnLine();
+
+    lines.forEach(function(l){
+      l.life++;
+      var alpha = 1 - (l.life / l.maxLife);
+      if (alpha < 0) alpha = 0;
+      ctx.fillStyle = 'rgba(' + l.color + ',' + (alpha * 0.5) + ')';
+      ctx.fillRect(l.x, l.y, l.w, 2);
+    });
+
+    lines = lines.filter(function(l){ return l.life < l.maxLife; });
+
+    if (!reduceMotion) requestAnimationFrame(tick);
+  }
+  if (!reduceMotion) requestAnimationFrame(tick);
+
+  /* =========================================================
+     2) DONACIÓN
+     -------------------------------------------------------
+     Esto es SOLO el frontend. Todavía no hay backend real.
+     Cuando tengas el backend (paso 2 del plan), reemplazá
+     la función crearPreferenciaDePago() por un fetch real,
+     algo como:
+
+     async function crearPreferenciaDePago() {
+       const res = await fetch('https://TU-BACKEND.onrender.com/crear-preferencia', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ monto: 1000 })
+       });
+       const data = await res.json();
+       return data.init_point; // URL de pago que devuelve Mercado Pago
+     }
+
+     El backend es el único que debe hablar con la API de
+     Mercado Pago (nunca hardcodees tu Access Token acá,
+     en el HTML, porque cualquiera lo puede ver con F12).
+  ========================================================= */
+
+  var btnDonar = document.getElementById('btnDonar');
+  var status = document.getElementById('donateStatus');
+
+  function setStatus(msg, kind){
+    status.textContent = msg;
+    status.className = 'donate-status' + (kind ? ' ' + kind : '');
+  }
+
+  async function crearPreferenciaDePago(){
+    // --- STUB de desarrollo: acá todavía no hay backend. ---
+    // Simulamos una espera de red y devolvemos un link de ejemplo.
+    await new Promise(function(resolve){ setTimeout(resolve, 900); });
+    return 'https://www.mercadopago.com.ar/';
+  }
+
+  btnDonar.addEventListener('click', async function(){
+    btnDonar.disabled = true;
+    setStatus('Generando el link de pago…');
+
+    try{
+      var initPoint = await crearPreferenciaDePago();
+      setStatus('Listo. Abriendo Mercado Pago…', 'ok');
+      window.open(initPoint, '_blank', 'noopener');
+    }catch(err){
+      setStatus('No se pudo generar el pago. Probá de nuevo en un momento.', 'err');
+    }finally{
+      btnDonar.disabled = false;
+    }
+  });
+
+  /* =========================================================
+     3) Links de Kick / TikTok: reemplazar por tus URLs reales.
+  ========================================================= */
+  document.getElementById('linkKick').href = 'https://kick.com/mantecaa1';
+  document.getElementById('linkTiktok').href = 'https://www.tiktok.com/@mantecold1';
+
+})();
+</script>
+
+</body>
+</html>
